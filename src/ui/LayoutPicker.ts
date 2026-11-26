@@ -8,14 +8,16 @@ import {
   type StripTheme
 } from '../engine/layouts';
 
-function renderMiniGrid(layout: BoothLayout): string {
+function renderMiniGrid(layout: BoothLayout, large = false): string {
   const cells = Array.from({ length: layout.shotCount })
-    .map(() => `<span class="rounded-[2px] bg-current opacity-85"></span>`)
+    .map(() => `<span class="rounded-[3px] bg-current opacity-85"></span>`)
     .join('');
+
+  const sizeClass = large ? 'w-[72px] h-[88px] gap-[4px]' : 'w-5 h-6 gap-[2px]';
 
   return `
     <span
-      class="grid gap-[2px] w-5 h-6 shrink-0"
+      class="grid ${sizeClass} shrink-0"
       style="grid-template-columns: repeat(${layout.cols}, minmax(0, 1fr)); grid-template-rows: repeat(${layout.rows}, minmax(0, 1fr));"
     >
       ${cells}
@@ -75,7 +77,7 @@ export function createLayoutPicker(options: {
             Done ▾
           </button>
         </div>
-        <div data-grid class="grid grid-cols-2 gap-[6px] overflow-y-auto no-scrollbar pr-0.5"></div>
+        <div data-grid class="flex items-stretch gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory py-2 px-1"></div>
       </div>
     </div>
   `;
@@ -130,26 +132,35 @@ export function createLayoutPicker(options: {
       const isSelected = layout.id === activeLayout;
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `tactile-btn flex items-center gap-2.5 rounded-xl p-2.5 border text-left cursor-pointer ${
+      btn.className = `layout-card snap-center shrink-0 min-w-[116px] flex flex-col items-center justify-between gap-2.5 rounded-2xl p-3 border text-center cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1 hover:scale-[1.04] active:scale-95 ${
         isSelected
-          ? 'bg-[#FF2D8B] border-[#FF2D8B] text-[#F5F0E6] shadow-[0_0_16px_rgba(255,45,139,0.35)]'
-          : 'bg-[#141418] border-[#F5F0E6]/10 text-[#F5F0E6] hover:border-[#F5F0E6]/25'
+          ? 'bg-[#FF2D8B] border-[#FF2D8B] text-[#F5F0E6] shadow-[0_8px_24px_rgba(255,45,139,0.45)] scale-[1.02]'
+          : 'bg-[#141418] border-[#F5F0E6]/12 text-[#F5F0E6] hover:border-[#FF2D8B]/60 hover:bg-[#1C1C22] hover:shadow-[0_6px_20px_rgba(0,0,0,0.45)]'
       }`;
       btn.innerHTML = `
-        ${renderMiniGrid(layout)}
-        <span class="flex flex-col leading-tight min-w-0">
-          <span class="text-xs font-semibold truncate">${layout.name}</span>
-          <span class="text-[10px] ${
+        <span class="flex items-center justify-center rounded-xl p-2 ${
+          isSelected ? 'bg-[#0A0A0D]/20' : 'bg-[#0A0A0D]/50'
+        }">
+          ${renderMiniGrid(layout, true)}
+        </span>
+        <span class="flex flex-col leading-tight w-full">
+          <span class="text-xs font-bold truncate">${layout.name}</span>
+          <span class="text-[10px] mt-0.5 ${
             isSelected ? 'text-[#F5F0E6]/90' : 'text-[#A9A396]'
           } truncate">${layout.subtitle}</span>
         </span>
       `;
       btn.addEventListener('click', () => {
         activeLayout = layout.id;
+        gsap.fromTo(
+          btn,
+          { scale: 0.9 },
+          { scale: 1.05, duration: 0.18, ease: 'back.out(2.5)', yoyo: true, repeat: 1 }
+        );
         renderTrigger();
         renderGrid();
         options.onSelectLayout(layout.id);
-        closeDrawer();
+        setTimeout(closeDrawer, 140);
       });
       gridEl.appendChild(btn);
     }

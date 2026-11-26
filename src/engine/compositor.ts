@@ -54,30 +54,145 @@ function drawImageCover(
   ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
 }
 
+export type TextFontId = 'display' | 'sans' | 'serif' | 'mono' | 'handwriting';
+
+export interface TextOverlay {
+  id: string;
+  text: string;
+  x: number; // normalized 0..1
+  y: number; // normalized 0..1
+  fontSize: number; // base px (scaled to 720px width)
+  fontFamily: TextFontId;
+  color: string;
+}
+
+const FONT_FAMILY_MAP: Record<TextFontId, string> = {
+  display: '"Syne", sans-serif',
+  sans: '"Plus Jakarta Sans", sans-serif',
+  serif: 'Georgia, "Times New Roman", serif',
+  mono: '"JetBrains Mono", ui-monospace, monospace',
+  handwriting: '"Caveat", "Brush Script MT", cursive'
+};
+
 function decorateThemeBackground(
   ctx: CanvasRenderingContext2D,
   w: number,
   h: number,
   themeId: StripTheme
 ): void {
+  ctx.save();
+
+  if (themeId === 'black') {
+    // Film strip edge sprockets + viewfinder corner brackets
+    ctx.fillStyle = 'rgba(245, 240, 230, 0.12)';
+    for (let y = 32; y < h - 32; y += 44) {
+      ctx.fillRect(14, y, 10, 22);
+      ctx.fillRect(w - 24, y, 10, 22);
+    }
+    ctx.strokeStyle = 'rgba(255, 45, 139, 0.55)';
+    ctx.lineWidth = 4;
+    const b = 36;
+    // Top-left & top-right brackets
+    ctx.beginPath();
+    ctx.moveTo(28, 28 + b); ctx.lineTo(28, 28); ctx.lineTo(28 + b, 28);
+    ctx.moveTo(w - 28 - b, 28); ctx.lineTo(w - 28, 28); ctx.lineTo(w - 28, 28 + b);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255, 45, 139, 0.75)';
+    ctx.font = '700 16px "JetBrains Mono", monospace';
+    ctx.fillText('REC ●', 40, 48);
+    ctx.restore();
+    return;
+  }
+
+  if (themeId === 'pink') {
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#FF2D8B');
+    grad.addColorStop(0.5, '#FF479B');
+    grad.addColorStop(1, '#E01A75');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = 'rgba(245, 240, 230, 0.45)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([12, 8]);
+    ctx.strokeRect(20, 20, w - 40, h - 40);
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = 'rgba(245, 240, 230, 0.25)';
+    ctx.font = '26px sans-serif';
+    const marks = ['✦', '♡', '✧', '✿'];
+    let idx = 0;
+    for (let y = 44; y < h; y += 116) {
+      for (let x = 34; x < w; x += 116) {
+        ctx.fillText(marks[idx % marks.length], x, y);
+        idx++;
+      }
+    }
+    ctx.restore();
+    return;
+  }
+
+  if (themeId === 'bone') {
+    // Warm editorial gallery frame with corner registration marks
+    ctx.strokeStyle = 'rgba(10, 10, 13, 0.14)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(22, 22, w - 44, h - 44);
+    ctx.fillStyle = 'rgba(10, 10, 13, 0.05)';
+    for (let y = 30; y < h; y += 48) {
+      for (let x = 30; x < w; x += 48) {
+        ctx.fillRect(x, y, 2, 2);
+      }
+    }
+    ctx.fillStyle = 'rgba(10, 10, 13, 0.35)';
+    ctx.font = '600 14px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('STUDIO EDITION · 35MM', 36, 42);
+    ctx.restore();
+    return;
+  }
+
   if (themeId === 'tiktok') {
-    // Dual cyan & magenta chromatic offset frame
+    // Dual cyan & magenta chromatic offset frame + floating music notes
     ctx.strokeStyle = '#25F4EE';
     ctx.lineWidth = 6;
     ctx.strokeRect(10, 10, w - 26, h - 26);
     ctx.strokeStyle = '#FE2C55';
     ctx.lineWidth = 6;
     ctx.strokeRect(16, 16, w - 26, h - 26);
+
+    ctx.fillStyle = 'rgba(37, 244, 238, 0.22)';
+    ctx.font = '28px sans-serif';
+    const notes = ['♪', '♫', '✦'];
+    let idx = 0;
+    for (let y = 52; y < h; y += 120) {
+      for (let x = 32; x < w; x += 124) {
+        ctx.fillStyle = idx % 2 === 0 ? 'rgba(37, 244, 238, 0.2)' : 'rgba(254, 44, 85, 0.2)';
+        ctx.fillText(notes[idx % notes.length], x, y);
+        idx++;
+      }
+    }
+    ctx.restore();
     return;
   }
 
   if (themeId === 'heart') {
-    ctx.save();
-    ctx.fillStyle = 'rgba(255, 45, 139, 0.16)';
-    ctx.font = '32px sans-serif';
-    for (let y = 36; y < h; y += 96) {
-      for (let x = 28; x < w; x += 96) {
-        ctx.fillText('💗', x, y);
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, '#2D0A1D');
+    grad.addColorStop(1, '#1A0510');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = 'rgba(255, 107, 176, 0.45)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(20, 20, w - 40, h - 40);
+
+    ctx.font = '30px sans-serif';
+    const icons = ['💗', '💖', '💕', '✨'];
+    let idx = 0;
+    for (let y = 38; y < h; y += 92) {
+      for (let x = 28; x < w; x += 92) {
+        ctx.fillStyle = 'rgba(255, 179, 217, 0.22)';
+        ctx.fillText(icons[idx % icons.length], x, y);
+        idx++;
       }
     }
     ctx.restore();
@@ -85,13 +200,24 @@ function decorateThemeBackground(
   }
 
   if (themeId === 'halloween') {
-    ctx.save();
-    ctx.fillStyle = 'rgba(255, 107, 26, 0.18)';
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, '#1A0E26');
+    grad.addColorStop(1, '#0D0614');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = 'rgba(255, 107, 26, 0.5)';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([14, 10]);
+    ctx.strokeRect(18, 18, w - 36, h - 36);
+    ctx.setLineDash([]);
+
     ctx.font = '30px sans-serif';
-    const icons = ['🎃', '🦇', '🕸️'];
+    const icons = ['🎃', '🦇', '🕸️', '👻', '🕷️'];
     let idx = 0;
-    for (let y = 40; y < h; y += 110) {
-      for (let x = 26; x < w; x += 110) {
+    for (let y = 42; y < h; y += 104) {
+      for (let x = 26; x < w; x += 104) {
+        ctx.fillStyle = 'rgba(255, 107, 26, 0.22)';
         ctx.fillText(icons[idx % icons.length], x, y);
         idx++;
       }
@@ -101,26 +227,40 @@ function decorateThemeBackground(
   }
 
   if (themeId === 'christmas') {
-    ctx.save();
-    ctx.fillStyle = 'rgba(245, 240, 230, 0.18)';
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, '#0D2B1D');
+    grad.addColorStop(1, '#071A11');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = 'rgba(250, 204, 21, 0.55)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(18, 18, w - 36, h - 36);
+    ctx.strokeStyle = 'rgba(225, 29, 72, 0.55)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(26, 26, w - 52, h - 52);
+
     ctx.font = '28px sans-serif';
-    const icons = ['❄️', '🎄', '⭐'];
+    const icons = ['❄️', '🎄', '⭐', '🎁', '🔔'];
     let idx = 0;
-    for (let y = 38; y < h; y += 108) {
-      for (let x = 28; x < w; x += 108) {
+    for (let y = 40; y < h; y += 102) {
+      for (let x = 28; x < w; x += 102) {
+        ctx.fillStyle = 'rgba(245, 240, 230, 0.22)';
         ctx.fillText(icons[idx % icons.length], x, y);
         idx++;
       }
     }
-    ctx.restore();
   }
+
+  ctx.restore();
 }
 
 export async function compositePhotoboothStrip(
   frames: HTMLCanvasElement[],
   layout: BoothLayout,
   themeId: StripTheme,
-  customCaption?: string
+  customCaption?: string,
+  overlays?: TextOverlay[]
 ): Promise<CompositedPhoto> {
   const canvas = document.createElement('canvas');
   canvas.width = layout.canvasWidth;
@@ -193,6 +333,24 @@ export async function compositePhotoboothStrip(
   ctx.font = '700 30px "Syne", sans-serif';
   ctx.fillStyle = theme.secondary ?? theme.accent;
   ctx.fillText(badgeMap[themeId], canvas.width - layout.padding, footerCenterY);
+
+  if (overlays && overlays.length > 0) {
+    const scale = canvas.width / 720;
+    for (const item of overlays) {
+      if (!item.text.trim()) continue;
+      ctx.save();
+      const px = Math.round(item.fontSize * scale);
+      ctx.font = `700 ${px}px ${FONT_FAMILY_MAP[item.fontFamily]}`;
+      ctx.fillStyle = item.color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+      ctx.shadowBlur = Math.max(4, px * 0.14);
+      ctx.shadowOffsetY = Math.max(2, px * 0.05);
+      ctx.fillText(item.text, item.x * canvas.width, item.y * canvas.height);
+      ctx.restore();
+    }
+  }
 
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(

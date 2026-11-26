@@ -356,10 +356,10 @@ const reviewSheet = createReviewSheet({
     renderProgressDots(0);
     renderMiniPreview([]);
   },
-  onUpdateCaption: async (caption: string) => {
+  onUpdateOverlays: async (overlays) => {
     if (lastShots.length === 0) return null;
     const layout = getLayoutById(prefs.layoutId);
-    return compositePhotoboothStrip(lastShots, layout, prefs.stripTheme, caption);
+    return compositePhotoboothStrip(lastShots, layout, prefs.stripTheme, undefined, overlays);
   }
 });
 
