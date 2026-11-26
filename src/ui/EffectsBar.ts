@@ -23,7 +23,7 @@ export function createEffectsBar(options: {
         ? 'bg-[#F5F0E6] border-[#F5F0E6] text-[#0A0A0D]'
         : 'bg-[#141418] border-[#F5F0E6]/12 text-[#A9A396]'
     }`;
-    noneBtn.textContent = 'Clean';
+    noneBtn.textContent = 'Natural ✨';
     noneBtn.addEventListener('click', () => {
       active.clear();
       options.onClearAll();

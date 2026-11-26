@@ -17,11 +17,11 @@ export function createReviewSheet(options: {
     <div data-sheet class="w-full max-w-md flex flex-col gap-4 transform translate-y-10">
       <div class="flex items-center justify-between px-1">
         <div>
-          <h2 class="font-display text-xl font-bold text-[#F5F0E6]">Your Strip is Ready</h2>
-          <p class="text-xs text-[#A9A396]">Save as JPEG or discard to re-take</p>
+          <h2 class="font-display text-xl font-bold text-[#F5F0E6]">Slayed the Booth ✦</h2>
+          <p class="text-xs text-[#A9A396]">Ready for your Story, or run it back</p>
         </div>
         <span data-badge class="rounded-full bg-[#FF2D8B]/15 border border-[#FF2D8B]/30 px-3 py-1 text-[11px] font-semibold text-[#FF2D8B]">
-          JPEG · HD
+          JPEG · STORY READY
         </span>
       </div>
 
@@ -41,14 +41,14 @@ export function createReviewSheet(options: {
           type="button"
           class="tactile-btn rounded-full bg-[#141418] border border-[#F5F0E6]/15 px-5 py-3.5 text-sm font-semibold text-[#F5F0E6] hover:border-[#F5F0E6]/35 cursor-pointer"
         >
-          Discard &amp; Retake
+          Run It Back ↺
         </button>
         <button
           data-save
           type="button"
           class="tactile-btn rounded-full bg-[#FF2D8B] px-5 py-3.5 text-sm font-semibold text-[#F5F0E6] shadow-[0_0_24px_rgba(255,45,139,0.4)] hover:bg-[#FF4297] cursor-pointer"
         >
-          Save JPEG
+          Save to Photos ✦
         </button>
       </div>
     </div>

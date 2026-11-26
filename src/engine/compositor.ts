@@ -110,7 +110,7 @@ export async function compositePhotoboothStrip(
   const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
   ctx.fillStyle = theme.accent;
   ctx.font = '600 20px "Plus Jakarta Sans", sans-serif';
-  ctx.fillText(`★ ${dateStr}`, layout.padding, footerCenterY + 20);
+  ctx.fillText(`★ ${dateStr} · #STARBOOTH`, layout.padding, footerCenterY + 20);
 
   // Decorative star mark on bottom right
   ctx.textAlign = 'right';

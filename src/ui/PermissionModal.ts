@@ -17,18 +17,18 @@ export function createPermissionModal(handlers: PermissionModalHandlers): {
       <div class="bezel-inner p-6 flex flex-col gap-5">
         <div class="flex items-center justify-between">
           <span class="inline-flex items-center gap-2 rounded-full bg-[#FF2D8B]/15 border border-[#FF2D8B]/30 px-3 py-1 text-xs font-semibold tracking-wide text-[#FF2D8B]">
-            ✦ STARPHOTOBOOTH
+            ✦ MAIN CHARACTER ENERGY
           </span>
-          <span class="text-xs text-[#A9A396]">v1.0</span>
+          <span class="text-xs text-[#A9A396]">STARBOOTH</span>
         </div>
 
         <div class="space-y-2">
           <h2 class="font-display text-2xl font-bold tracking-tight text-[#F5F0E6]">
-            Step into the booth
+            Lights. Camera. Pose.
           </h2>
           <p class="text-sm leading-relaxed text-[#A9A396]">
-            Allow camera access to shoot multi-frame strips and run live face effects.
-            We also use a tiny preference cookie to remember your favorite layout.
+            Pick your strip, stack live AR props, and drop crisp photobooth strips
+            straight to your camera roll. We use a tiny cookie to remember your vibe.
           </p>
         </div>
 
@@ -39,7 +39,7 @@ export function createPermissionModal(handlers: PermissionModalHandlers): {
           type="button"
           class="tactile-btn w-full rounded-full bg-[#FF2D8B] px-6 py-3.5 text-sm font-semibold text-[#F5F0E6] shadow-[0_0_24px_rgba(255,45,139,0.35)] hover:bg-[#FF4297] cursor-pointer"
         >
-          Allow Camera &amp; Continue
+          Open Camera &amp; Glow ✦
         </button>
       </div>
     </div>

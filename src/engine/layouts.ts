@@ -18,8 +18,8 @@ export interface BoothLayout {
 export const BOOTH_LAYOUTS: readonly BoothLayout[] = [
   {
     id: '2x2',
-    name: '2 × 2 Grid',
-    subtitle: '4 shots · Square',
+    name: '2 × 2 Pop',
+    subtitle: '4 shots · Bestie Grid',
     cols: 2,
     rows: 2,
     shotCount: 4,
@@ -31,8 +31,8 @@ export const BOOTH_LAYOUTS: readonly BoothLayout[] = [
   },
   {
     id: '3-down',
-    name: '3-Down Strip',
-    subtitle: '3 shots · Classic',
+    name: '3-Down Classic',
+    subtitle: '3 shots · Booth Strip',
     cols: 1,
     rows: 3,
     shotCount: 3,
@@ -44,8 +44,8 @@ export const BOOTH_LAYOUTS: readonly BoothLayout[] = [
   },
   {
     id: '4-down',
-    name: '4-Down Strip',
-    subtitle: '4 shots · Studio',
+    name: '4-Down Idol',
+    subtitle: '4 shots · K-Booth',
     cols: 1,
     rows: 4,
     shotCount: 4,
@@ -57,8 +57,8 @@ export const BOOTH_LAYOUTS: readonly BoothLayout[] = [
   },
   {
     id: '3x2',
-    name: '3 × 2 Wide',
-    subtitle: '6 shots · Panorama',
+    name: '3 × 2 Party',
+    subtitle: '6 shots · Squad Wide',
     cols: 3,
     rows: 2,
     shotCount: 6,
@@ -70,8 +70,8 @@ export const BOOTH_LAYOUTS: readonly BoothLayout[] = [
   },
   {
     id: '2x3',
-    name: '2 × 3 Strip',
-    subtitle: '6 shots · Double',
+    name: '2 × 3 Cinema',
+    subtitle: '6 shots · Double Strip',
     cols: 2,
     rows: 3,
     shotCount: 6,
@@ -83,8 +83,8 @@ export const BOOTH_LAYOUTS: readonly BoothLayout[] = [
   },
   {
     id: '1x1',
-    name: '1 × 1 Solo',
-    subtitle: '1 shot · Portrait',
+    name: '1 × 1 Poster',
+    subtitle: '1 shot · Cover Star',
     cols: 1,
     rows: 1,
     shotCount: 1,

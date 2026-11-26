@@ -20,13 +20,13 @@ export interface BoothEffect {
 }
 
 export const BOOTH_EFFECTS: readonly BoothEffect[] = [
-  { id: 'star', label: 'Spin Star', emoji: '✦' },
-  { id: 'cowboy', label: 'Cowboy', emoji: '🤠' },
-  { id: 'glasses', label: 'Shades', emoji: '🕶️' },
-  { id: 'hearts', label: 'Hearts', emoji: '💗' },
-  { id: 'crown', label: 'Crown', emoji: '👑' },
-  { id: 'bunny', label: 'Bunny', emoji: '🐰' },
-  { id: 'blush', label: 'Blush', emoji: '✨' }
+  { id: 'star', label: 'Star Halo', emoji: '✦' },
+  { id: 'cowboy', label: 'Yeehaw', emoji: '🤠' },
+  { id: 'glasses', label: 'Pink Baddie', emoji: '🕶️' },
+  { id: 'hearts', label: 'Love Float', emoji: '💗' },
+  { id: 'crown', label: 'Main Character', emoji: '👑' },
+  { id: 'bunny', label: 'Bun-Bun', emoji: '🐰' },
+  { id: 'blush', label: 'Peach Glow', emoji: '✨' }
 ];
 
 interface HeartParticle {

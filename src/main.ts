@@ -2,8 +2,14 @@ import './styles/main.css';
 import gsap from 'gsap';
 import { CameraController } from './engine/camera';
 import { compositePhotoboothStrip } from './engine/compositor';
-import { EffectsEngine } from './engine/effects';
-import { getLayoutById, type LayoutId, type StripTheme } from './engine/layouts';
+import { BOOTH_EFFECTS, EffectsEngine } from './engine/effects';
+import {
+  BOOTH_LAYOUTS,
+  getLayoutById,
+  STRIP_THEMES,
+  type LayoutId,
+  type StripTheme
+} from './engine/layouts';
 import {
   fetchSessionState,
   saveCookieConsent,
@@ -29,11 +35,19 @@ appRoot.innerHTML = `
 
       <div class="flex items-center gap-2">
         <button
+          data-vibe-btn
+          type="button"
+          title="Randomize layout, frame & AR vibe"
+          class="tactile-btn rounded-full bg-[#FF2D8B]/15 border border-[#FF2D8B]/35 px-3 py-1.5 text-xs font-semibold text-[#FF2D8B] cursor-pointer"
+        >
+          🎲 Vibe
+        </button>
+        <button
           data-timer-btn
           type="button"
           class="tactile-btn rounded-full bg-[#141418] border border-[#F5F0E6]/12 px-3 py-1.5 text-xs font-semibold text-[#F5F0E6] cursor-pointer"
         >
-          3s
+          ⏱ 3s
         </button>
         <button
           data-flip-btn
@@ -41,7 +55,7 @@ appRoot.innerHTML = `
           aria-label="Switch camera"
           class="tactile-btn rounded-full bg-[#141418] border border-[#F5F0E6]/12 px-3 py-1.5 text-xs font-semibold text-[#F5F0E6] cursor-pointer"
         >
-          Flip
+          ↻ Flip
         </button>
       </div>
     </header>
@@ -64,6 +78,11 @@ appRoot.innerHTML = `
           <div
             data-progress
             class="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-[#0A0A0D]/70 backdrop-blur-md border border-[#F5F0E6]/12 px-3 py-1.5"
+          ></div>
+
+          <div
+            data-pose-cue
+            class="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-[#0A0A0D]/80 backdrop-blur-md border border-[#FF2D8B]/40 px-4 py-1.5 text-xs font-semibold text-[#F5F0E6] whitespace-nowrap pointer-events-none opacity-0"
           ></div>
 
           <div
@@ -90,10 +109,10 @@ appRoot.innerHTML = `
           data-shutter
           type="button"
           aria-label="Take photobooth strip"
-          class="tactile-btn relative w-[72px] h-[72px] rounded-full p-1 border-2 border-[#F5F0E6] bg-transparent flex items-center justify-center cursor-pointer shadow-[0_0_28px_rgba(255,45,139,0.3)]"
+          class="tactile-btn relative w-[74px] h-[74px] rounded-full p-1 border-2 border-[#F5F0E6] bg-transparent flex items-center justify-center cursor-pointer shadow-[0_0_28px_rgba(255,45,139,0.35)]"
         >
-          <span class="w-full h-full rounded-full bg-[#FF2D8B] flex items-center justify-center text-[#F5F0E6] font-display text-xs font-bold tracking-wider">
-            SNAP
+          <span class="w-full h-full rounded-full bg-[#FF2D8B] flex items-center justify-center text-[#F5F0E6] font-display text-[11px] font-extrabold tracking-wider">
+            SHOOT ✦
           </span>
         </button>
       </div>
@@ -107,9 +126,11 @@ const controlsEl = appRoot.querySelector<HTMLElement>('[data-controls]')!;
 const videoEl = appRoot.querySelector<HTMLVideoElement>('[data-video]')!;
 const overlayEl = appRoot.querySelector<HTMLCanvasElement>('[data-overlay]')!;
 const progressEl = appRoot.querySelector<HTMLElement>('[data-progress]')!;
+const poseCueEl = appRoot.querySelector<HTMLElement>('[data-pose-cue]')!;
 const countdownEl = appRoot.querySelector<HTMLElement>('[data-countdown]')!;
 const countdownText = countdownEl.querySelector('span')!;
 const flashEl = appRoot.querySelector<HTMLElement>('[data-flash]')!;
+const vibeBtn = appRoot.querySelector<HTMLButtonElement>('[data-vibe-btn]')!;
 const timerBtn = appRoot.querySelector<HTMLButtonElement>('[data-timer-btn]')!;
 const flipBtn = appRoot.querySelector<HTMLButtonElement>('[data-flip-btn]')!;
 const shutterBtn = appRoot.querySelector<HTMLButtonElement>('[data-shutter]')!;
@@ -261,12 +282,59 @@ layoutsSlot.appendChild(layoutPicker.el);
 appRoot.appendChild(reviewSheet.el);
 appRoot.appendChild(permissionModal.el);
 
+const POSE_CUES = [
+  'Serve face ✨',
+  'Peace sign ✌️',
+  'Main character ✦',
+  'Big smile 💗',
+  'Wink 😉',
+  'Blow a kiss 💋'
+];
+
+function showPoseCue(text: string): void {
+  poseCueEl.textContent = text;
+  gsap.killTweensOf(poseCueEl);
+  gsap.fromTo(
+    poseCueEl,
+    { opacity: 0, y: 8, scale: 0.94 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.25, ease: 'power3.out' }
+  );
+}
+
+function hidePoseCue(): void {
+  gsap.to(poseCueEl, { opacity: 0, y: 4, duration: 0.2, ease: 'power2.in' });
+}
+
+vibeBtn.addEventListener('click', () => {
+  if (isShooting) return;
+  const randomLayout = BOOTH_LAYOUTS[Math.floor(Math.random() * BOOTH_LAYOUTS.length)];
+  const themes = Object.keys(STRIP_THEMES) as StripTheme[];
+  const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+
+  effects.clearAll();
+  const shuffled = [...BOOTH_EFFECTS].sort(() => Math.random() - 0.5);
+  effects.toggle(shuffled[0].id);
+  effects.toggle(shuffled[1].id);
+  effectsBar.sync(effects.getActive());
+
+  prefs = { ...prefs, layoutId: randomLayout.id, stripTheme: randomTheme };
+  layoutPicker.setLayout(randomLayout.id);
+  layoutPicker.setTheme(randomTheme);
+  renderProgressDots(0);
+  void savePreferences(prefs);
+
+  showPoseCue(`Vibe: ${shuffled[0].emoji} + ${shuffled[1].emoji} ${randomLayout.name}`);
+  setTimeout(() => {
+    if (!isShooting) hidePoseCue();
+  }, 1800);
+});
+
 timerBtn.addEventListener('click', () => {
   prefs = {
     ...prefs,
     countdownSeconds: prefs.countdownSeconds === 3 ? 5 : 3
   };
-  timerBtn.textContent = `${prefs.countdownSeconds}s`;
+  timerBtn.textContent = `⏱ ${prefs.countdownSeconds}s`;
   void savePreferences(prefs);
 });
 
@@ -291,6 +359,7 @@ shutterBtn.addEventListener('click', async () => {
 
   try {
     for (let i = 0; i < layout.shotCount; i++) {
+      showPoseCue(`Shot ${i + 1}/${layout.shotCount} · ${POSE_CUES[i % POSE_CUES.length]}`);
       await runCountdown(prefs.countdownSeconds);
       triggerFlash();
       shots.push(captureCompositeFrame());
@@ -300,9 +369,11 @@ shutterBtn.addEventListener('click', async () => {
       }
     }
 
+    hidePoseCue();
     const photo = await compositePhotoboothStrip(shots, layout, prefs.stripTheme);
     reviewSheet.open(photo);
   } finally {
+    hidePoseCue();
     isShooting = false;
     shutterBtn.disabled = false;
   }
@@ -313,7 +384,7 @@ async function bootstrap() {
   prefs = session.preferences;
   layoutPicker.setLayout(prefs.layoutId);
   layoutPicker.setTheme(prefs.stripTheme);
-  timerBtn.textContent = `${prefs.countdownSeconds}s`;
+  timerBtn.textContent = `⏱ ${prefs.countdownSeconds}s`;
   renderProgressDots(0);
   startRenderLoop();
 
