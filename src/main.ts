@@ -84,7 +84,12 @@ appRoot.innerHTML = `
 
           <div
             data-progress
-            class="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-[#0A0A0D]/70 backdrop-blur-md border border-[#F5F0E6]/12 px-3 py-1.5"
+            class="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-[#0A0A0D]/75 backdrop-blur-md border border-[#F5F0E6]/12 px-3 py-1.5"
+          ></div>
+
+          <div
+            data-mini-preview
+            class="absolute top-3 right-3 rounded-xl p-1.5 shadow-lg border backdrop-blur-md transition-colors duration-200 pointer-events-none"
           ></div>
 
           <div
@@ -116,11 +121,9 @@ appRoot.innerHTML = `
           data-shutter
           type="button"
           aria-label="Take photobooth strip"
-          class="tactile-btn relative w-[74px] h-[74px] rounded-full p-1 border-2 border-[#F5F0E6] bg-transparent flex items-center justify-center cursor-pointer shadow-[0_0_28px_rgba(255,45,139,0.35)]"
+          class="tactile-btn relative w-[72px] h-[72px] rounded-full p-1.5 border-[3px] border-[#F5F0E6] bg-transparent flex items-center justify-center cursor-pointer shadow-[0_0_28px_rgba(255,45,139,0.35)]"
         >
-          <span class="w-full h-full rounded-full bg-[#FF2D8B] flex items-center justify-center text-[#F5F0E6] font-display text-[11px] font-extrabold tracking-wider">
-            SHOOT ✦
-          </span>
+          <span class="w-full h-full rounded-full bg-[#FF2D8B] block"></span>
         </button>
       </div>
     </section>
@@ -133,6 +136,7 @@ const controlsEl = appRoot.querySelector<HTMLElement>('[data-controls]')!;
 const videoEl = appRoot.querySelector<HTMLVideoElement>('[data-video]')!;
 const overlayEl = appRoot.querySelector<HTMLCanvasElement>('[data-overlay]')!;
 const progressEl = appRoot.querySelector<HTMLElement>('[data-progress]')!;
+const miniPreviewEl = appRoot.querySelector<HTMLElement>('[data-mini-preview]')!;
 const poseCueEl = appRoot.querySelector<HTMLElement>('[data-pose-cue]')!;
 const countdownEl = appRoot.querySelector<HTMLElement>('[data-countdown]')!;
 const countdownText = countdownEl.querySelector('span')!;
@@ -193,6 +197,44 @@ function syncOverlaySize() {
       overlayEl.height = targetH;
     }
   }
+}
+
+const CAMERA_GRANTED_KEY = 'starbooth_camera_granted';
+let liveThumbs: string[] = [];
+
+function formatTimerLabel(seconds: 0 | 3 | 5): string {
+  return seconds === 0 ? '⏱ NOW' : `⏱ ${seconds}s`;
+}
+
+function renderMiniPreview(thumbs: string[] = liveThumbs): void {
+  const layout = getLayoutById(prefs.layoutId);
+  const theme = STRIP_THEMES[prefs.stripTheme];
+  const cellW = layout.cols === 1 ? 24 : 18;
+  const cellH = layout.rows >= 3 ? 16 : 22;
+
+  miniPreviewEl.style.backgroundColor = theme.bg;
+  miniPreviewEl.style.borderColor = theme.border;
+
+  const cellsHtml = Array.from({ length: layout.shotCount })
+    .map((_, idx) => {
+      const thumb = thumbs[idx];
+      const isNext = idx === thumbs.length && thumbs.length < layout.shotCount;
+      if (thumb) {
+        return `<div style="width:${cellW}px;height:${cellH}px" class="rounded-[3px] overflow-hidden border border-[#F5F0E6]/40"><img src="${thumb}" alt="" class="w-full h-full object-cover" /></div>`;
+      }
+      return `<div style="width:${cellW}px;height:${cellH}px" class="rounded-[3px] border ${
+        isNext
+          ? 'border-[#FF2D8B] bg-[#FF2D8B]/25 animate-pulse'
+          : 'border-dashed border-[#F5F0E6]/30 bg-black/25'
+      }"></div>`;
+    })
+    .join('');
+
+  miniPreviewEl.innerHTML = `
+    <div class="grid gap-[3px]" style="grid-template-columns:repeat(${layout.cols}, minmax(0, 1fr))">
+      ${cellsHtml}
+    </div>
+  `;
 }
 
 function renderProgressDots(completedCount = 0) {
@@ -256,6 +298,7 @@ function captureCompositeFrame(): HTMLCanvasElement {
 }
 
 async function runCountdown(seconds: number): Promise<void> {
+  if (seconds <= 0) return;
   for (let s = seconds; s >= 1; s--) {
     countdownText.textContent = String(s);
     gsap.killTweensOf(countdownEl);
@@ -283,11 +326,14 @@ const layoutPicker = createLayoutPicker({
   initialTheme: prefs.stripTheme,
   onSelectLayout: (id: LayoutId) => {
     prefs = { ...prefs, layoutId: id };
+    liveThumbs = [];
     renderProgressDots(0);
+    renderMiniPreview([]);
     void savePreferences(prefs);
   },
   onSelectTheme: (theme: StripTheme) => {
     prefs = { ...prefs, stripTheme: theme };
+    renderMiniPreview();
     void savePreferences(prefs);
   }
 });
@@ -299,7 +345,9 @@ const effectsBar = createEffectsBar({
 
 const reviewSheet = createReviewSheet({
   onRetake: () => {
+    liveThumbs = [];
     renderProgressDots(0);
+    renderMiniPreview([]);
   }
 });
 
@@ -307,6 +355,7 @@ const permissionModal = createPermissionModal({
   onGrantCamera: async () => {
     await saveCookieConsent(true);
     await camera.start(videoEl, 'user');
+    localStorage.setItem(CAMERA_GRANTED_KEY, '1');
     void effects.initFaceTracking();
   }
 });
@@ -352,9 +401,11 @@ vibeBtn.addEventListener('click', () => {
   effectsBar.sync(effects.getActive());
 
   prefs = { ...prefs, layoutId: randomLayout.id, stripTheme: randomTheme };
+  liveThumbs = [];
   layoutPicker.setLayout(randomLayout.id);
   layoutPicker.setTheme(randomTheme);
   renderProgressDots(0);
+  renderMiniPreview([]);
   void savePreferences(prefs);
 
   showPoseCue(`Vibe: ${shuffled[0].emoji} + ${shuffled[1].emoji} ${randomLayout.name}`);
@@ -364,11 +415,10 @@ vibeBtn.addEventListener('click', () => {
 });
 
 timerBtn.addEventListener('click', () => {
-  prefs = {
-    ...prefs,
-    countdownSeconds: prefs.countdownSeconds === 3 ? 5 : 3
-  };
-  timerBtn.textContent = `⏱ ${prefs.countdownSeconds}s`;
+  const next: 0 | 3 | 5 =
+    prefs.countdownSeconds === 0 ? 3 : prefs.countdownSeconds === 3 ? 5 : 0;
+  prefs = { ...prefs, countdownSeconds: next };
+  timerBtn.textContent = formatTimerLabel(next);
   void savePreferences(prefs);
 });
 
@@ -390,14 +440,20 @@ shutterBtn.addEventListener('click', async () => {
 
   const layout = getLayoutById(prefs.layoutId);
   const shots: HTMLCanvasElement[] = [];
+  liveThumbs = [];
+  renderProgressDots(0);
+  renderMiniPreview([]);
 
   try {
     for (let i = 0; i < layout.shotCount; i++) {
       showPoseCue(`Shot ${i + 1}/${layout.shotCount} · ${POSE_CUES[i % POSE_CUES.length]}`);
       await runCountdown(prefs.countdownSeconds);
       triggerFlash();
-      shots.push(captureCompositeFrame());
+      const frame = captureCompositeFrame();
+      shots.push(frame);
+      liveThumbs.push(frame.toDataURL('image/jpeg', 0.45));
       renderProgressDots(i + 1);
+      renderMiniPreview(liveThumbs);
       if (i < layout.shotCount - 1) {
         await new Promise((r) => setTimeout(r, 450));
       }
@@ -413,13 +469,30 @@ shutterBtn.addEventListener('click', async () => {
   }
 });
 
+async function hasSavedCameraPermission(): Promise<boolean> {
+  if (localStorage.getItem(CAMERA_GRANTED_KEY) === '1') return true;
+  try {
+    if (navigator.permissions?.query) {
+      const status = await navigator.permissions.query({ name: 'camera' as PermissionName });
+      if (status.state === 'granted') {
+        localStorage.setItem(CAMERA_GRANTED_KEY, '1');
+        return true;
+      }
+    }
+  } catch {
+    // Safari may not support permissions.query('camera')
+  }
+  return false;
+}
+
 async function bootstrap() {
   const session = await fetchSessionState();
   prefs = session.preferences;
   layoutPicker.setLayout(prefs.layoutId);
   layoutPicker.setTheme(prefs.stripTheme);
-  timerBtn.textContent = `⏱ ${prefs.countdownSeconds}s`;
+  timerBtn.textContent = formatTimerLabel(prefs.countdownSeconds);
   renderProgressDots(0);
+  renderMiniPreview([]);
   startRenderLoop();
 
   // Entrance choreography (composite-only)
@@ -439,11 +512,14 @@ async function bootstrap() {
     ease: 'power3.out'
   });
 
-  if (session.consentAccepted) {
+  const canAutoStart = session.consentAccepted || (await hasSavedCameraPermission());
+  if (canAutoStart) {
     try {
       await camera.start(videoEl, 'user');
+      localStorage.setItem(CAMERA_GRANTED_KEY, '1');
       void effects.initFaceTracking();
     } catch (err) {
+      localStorage.removeItem(CAMERA_GRANTED_KEY);
       const msg = err instanceof Error ? err.message : undefined;
       permissionModal.show(msg);
     }

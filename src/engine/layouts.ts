@@ -1,5 +1,12 @@
 export type LayoutId = '1x1' | '2x2' | '3x2' | '3-down' | '4-down' | '2x3';
-export type StripTheme = 'black' | 'pink' | 'bone';
+export type StripTheme =
+  | 'black'
+  | 'pink'
+  | 'bone'
+  | 'tiktok'
+  | 'heart'
+  | 'halloween'
+  | 'christmas';
 
 export interface BoothLayout {
   id: LayoutId;
@@ -135,7 +142,7 @@ export function computeLayoutSlots(layout: BoothLayout): SlotRect[] {
 
 export const STRIP_THEMES: Record<
   StripTheme,
-  { label: string; bg: string; text: string; accent: string; border: string }
+  { label: string; bg: string; text: string; accent: string; border: string; secondary?: string }
 > = {
   black: {
     label: 'Obsidian',
@@ -157,5 +164,37 @@ export const STRIP_THEMES: Record<
     text: '#0A0A0D',
     accent: '#FF2D8B',
     border: '#DDD6C7'
+  },
+  tiktok: {
+    label: 'TikTok',
+    bg: '#09090C',
+    text: '#F5F0E6',
+    accent: '#FE2C55',
+    border: '#25F4EE',
+    secondary: '#25F4EE'
+  },
+  heart: {
+    label: 'Hearts',
+    bg: '#230916',
+    text: '#F5F0E6',
+    accent: '#FF2D8B',
+    border: '#FF6BB0',
+    secondary: '#FFB3D9'
+  },
+  halloween: {
+    label: 'Spooky',
+    bg: '#130B1A',
+    text: '#F5F0E6',
+    accent: '#FF6B1A',
+    border: '#FF6B1A',
+    secondary: '#A855F7'
+  },
+  christmas: {
+    label: 'Holiday',
+    bg: '#0B2418',
+    text: '#F5F0E6',
+    accent: '#E11D48',
+    border: '#F5F0E6',
+    secondary: '#FACC15'
   }
 };

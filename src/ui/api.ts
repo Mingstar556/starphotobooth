@@ -3,7 +3,7 @@ import type { LayoutId, StripTheme } from '../engine/layouts';
 export interface SessionPreferences {
   layoutId: LayoutId;
   stripTheme: StripTheme;
-  countdownSeconds: 3 | 5;
+  countdownSeconds: 0 | 3 | 5;
   mirrorSelfie: boolean;
 }
 

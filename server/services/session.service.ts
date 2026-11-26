@@ -9,12 +9,20 @@ export const LayoutIdSchema = z.enum([
   '2x3'
 ]);
 
-export const StripThemeSchema = z.enum(['black', 'pink', 'bone']);
+export const StripThemeSchema = z.enum([
+  'black',
+  'pink',
+  'bone',
+  'tiktok',
+  'heart',
+  'halloween',
+  'christmas'
+]);
 
 export const PreferencesSchema = z.object({
   layoutId: LayoutIdSchema.default('2x2'),
   stripTheme: StripThemeSchema.default('black'),
-  countdownSeconds: z.union([z.literal(3), z.literal(5)]).default(3),
+  countdownSeconds: z.union([z.literal(0), z.literal(3), z.literal(5)]).default(3),
   mirrorSelfie: z.boolean().default(true)
 });
 

@@ -41,12 +41,12 @@ export function createLayoutPicker(options: {
   layoutRow.className = 'flex items-center gap-2 overflow-x-auto no-scrollbar px-1 py-0.5';
 
   const themeRow = document.createElement('div');
-  themeRow.className = 'flex items-center justify-between px-1';
+  themeRow.className = 'flex items-center gap-2.5 px-1';
   themeRow.innerHTML = `
-    <span class="text-[11px] font-medium uppercase tracking-[0.14em] text-[#A9A396]">
-      Strip Frame
+    <span class="text-[11px] font-medium uppercase tracking-[0.14em] text-[#A9A396] shrink-0">
+      Frame
     </span>
-    <div data-themes class="flex items-center gap-2"></div>
+    <div data-themes class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5"></div>
   `;
 
   const themesContainer = themeRow.querySelector<HTMLElement>('[data-themes]')!;
@@ -89,7 +89,7 @@ export function createLayoutPicker(options: {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.ariaLabel = `${t.label} frame`;
-      btn.className = `tactile-btn flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium border cursor-pointer ${
+      btn.className = `tactile-btn shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium border cursor-pointer ${
         isSelected
           ? 'border-[#FF2D8B] bg-[#1C1C22] text-[#F5F0E6]'
           : 'border-[#F5F0E6]/10 bg-[#141418] text-[#A9A396]'
