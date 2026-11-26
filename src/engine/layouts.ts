@@ -1,4 +1,14 @@
-export type LayoutId = '1x1' | '2x2' | '3x2' | '3-down' | '4-down' | '2x3';
+export type LayoutId =
+  | '1x1'
+  | '1x2'
+  | '2x1'
+  | '2x2'
+  | '3x2'
+  | '3-down'
+  | '4-down'
+  | '2x3'
+  | '3x3'
+  | '4x2';
 export type StripTheme =
   | 'black'
   | 'pink'
@@ -37,6 +47,19 @@ export const BOOTH_LAYOUTS: readonly BoothLayout[] = [
     footerHeight: 130
   },
   {
+    id: '4-down',
+    name: '4-Down Idol',
+    subtitle: '4 shots · K-Booth',
+    cols: 1,
+    rows: 4,
+    shotCount: 4,
+    canvasWidth: 720,
+    canvasHeight: 2120,
+    padding: 46,
+    gap: 24,
+    footerHeight: 140
+  },
+  {
     id: '3-down',
     name: '3-Down Classic',
     subtitle: '3 shots · Booth Strip',
@@ -50,17 +73,30 @@ export const BOOTH_LAYOUTS: readonly BoothLayout[] = [
     footerHeight: 140
   },
   {
-    id: '4-down',
-    name: '4-Down Idol',
-    subtitle: '4 shots · K-Booth',
+    id: '1x2',
+    name: '2-Down Duo',
+    subtitle: '2 shots · Tall Strip',
     cols: 1,
-    rows: 4,
-    shotCount: 4,
-    canvasWidth: 720,
-    canvasHeight: 2120,
-    padding: 46,
-    gap: 24,
+    rows: 2,
+    shotCount: 2,
+    canvasWidth: 820,
+    canvasHeight: 1480,
+    padding: 50,
+    gap: 28,
     footerHeight: 140
+  },
+  {
+    id: '2x1',
+    name: '2-Up Polaroid',
+    subtitle: '2 shots · Side by Side',
+    cols: 2,
+    rows: 1,
+    shotCount: 2,
+    canvasWidth: 1440,
+    canvasHeight: 960,
+    padding: 48,
+    gap: 28,
+    footerHeight: 130
   },
   {
     id: '3x2',
@@ -86,6 +122,32 @@ export const BOOTH_LAYOUTS: readonly BoothLayout[] = [
     canvasHeight: 1760,
     padding: 48,
     gap: 24,
+    footerHeight: 130
+  },
+  {
+    id: '4x2',
+    name: '4 × 2 Booth',
+    subtitle: '8 shots · Double 4-Cut',
+    cols: 2,
+    rows: 4,
+    shotCount: 8,
+    canvasWidth: 1120,
+    canvasHeight: 2080,
+    padding: 44,
+    gap: 22,
+    footerHeight: 130
+  },
+  {
+    id: '3x3',
+    name: '3 × 3 Mega',
+    subtitle: '9 shots · Arcade Grid',
+    cols: 3,
+    rows: 3,
+    shotCount: 9,
+    canvasWidth: 1500,
+    canvasHeight: 1680,
+    padding: 46,
+    gap: 22,
     footerHeight: 130
   },
   {

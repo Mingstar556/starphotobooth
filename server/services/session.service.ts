@@ -2,11 +2,15 @@ import { z } from 'zod';
 
 export const LayoutIdSchema = z.enum([
   '1x1',
+  '1x2',
+  '2x1',
   '2x2',
   '3x2',
   '3-down',
   '4-down',
-  '2x3'
+  '2x3',
+  '3x3',
+  '4x2'
 ]);
 
 export const StripThemeSchema = z.enum([

@@ -35,18 +35,18 @@ export function createLayoutPicker(options: {
   let activeTheme = options.initialTheme;
 
   const el = document.createElement('div');
-  el.className = 'w-full flex flex-col gap-2.5';
+  el.className = 'w-full flex flex-col gap-[6px]';
 
   const layoutRow = document.createElement('div');
-  layoutRow.className = 'flex items-center gap-2 overflow-x-auto no-scrollbar px-1 py-0.5';
+  layoutRow.className = 'flex items-center gap-[6px] overflow-x-auto no-scrollbar py-[2px]';
 
   const themeRow = document.createElement('div');
-  themeRow.className = 'flex items-center gap-2.5 px-1';
+  themeRow.className = 'flex items-center gap-[6px]';
   themeRow.innerHTML = `
-    <span class="text-[11px] font-medium uppercase tracking-[0.14em] text-[#A9A396] shrink-0">
+    <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A9A396] shrink-0">
       Frame
     </span>
-    <div data-themes class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5"></div>
+    <div data-themes class="flex items-center gap-[6px] overflow-x-auto no-scrollbar py-[2px]"></div>
   `;
 
   const themesContainer = themeRow.querySelector<HTMLElement>('[data-themes]')!;
@@ -57,7 +57,7 @@ export function createLayoutPicker(options: {
       const isSelected = layout.id === activeLayout;
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `tactile-btn shrink-0 flex items-center gap-2.5 rounded-2xl px-3.5 py-2 border text-left cursor-pointer ${
+      btn.className = `tactile-btn shrink-0 flex items-center gap-2 rounded-xl px-2.5 py-1.5 border text-left cursor-pointer ${
         isSelected
           ? 'bg-[#FF2D8B] border-[#FF2D8B] text-[#F5F0E6] shadow-[0_0_18px_rgba(255,45,139,0.35)]'
           : 'bg-[#141418] border-[#F5F0E6]/10 text-[#F5F0E6] hover:border-[#F5F0E6]/25'

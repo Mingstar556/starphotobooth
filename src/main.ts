@@ -24,20 +24,20 @@ import { createReviewSheet } from './ui/ReviewSheet';
 const appRoot = document.querySelector<HTMLDivElement>('#app')!;
 
 appRoot.innerHTML = `
-  <main class="min-h-[100dvh] w-full max-w-lg mx-auto flex flex-col justify-between px-3.5 safe-top safe-bottom gap-3">
-    <header data-header class="flex items-center justify-between pt-1 opacity-0 -translate-y-2">
-      <div class="flex items-center gap-2">
+  <main class="h-[100dvh] w-full max-w-lg mx-auto flex flex-col justify-between px-3 safe-top safe-bottom gap-[6px] overflow-hidden">
+    <header data-header class="shrink-0 flex items-center justify-between pt-0.5 opacity-0 -translate-y-2">
+      <div class="flex items-center gap-[6px]">
         <span class="w-2.5 h-2.5 rounded-full bg-[#FF2D8B] shadow-[0_0_12px_#FF2D8B]"></span>
-        <h1 class="font-display text-lg font-extrabold tracking-tight text-[#F5F0E6]">
+        <h1 class="font-display text-base font-extrabold tracking-tight text-[#F5F0E6]">
           STARBOOTH
         </h1>
       </div>
 
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-[6px]">
         <button
           data-install-btn
           type="button"
-          class="hidden tactile-btn rounded-full bg-[#F5F0E6] px-3 py-1.5 text-xs font-bold text-[#0A0A0D] cursor-pointer"
+          class="hidden tactile-btn rounded-full bg-[#F5F0E6] px-2.5 py-1 text-[11px] font-bold text-[#0A0A0D] cursor-pointer"
         >
           📲 Install
         </button>
@@ -45,30 +45,22 @@ appRoot.innerHTML = `
           data-vibe-btn
           type="button"
           title="Randomize layout, frame & AR vibe"
-          class="tactile-btn rounded-full bg-[#FF2D8B]/15 border border-[#FF2D8B]/35 px-3 py-1.5 text-xs font-semibold text-[#FF2D8B] cursor-pointer"
+          class="tactile-btn rounded-full bg-[#FF2D8B]/15 border border-[#FF2D8B]/35 px-2.5 py-1 text-[11px] font-semibold text-[#FF2D8B] cursor-pointer"
         >
           🎲 Vibe
         </button>
         <button
           data-timer-btn
           type="button"
-          class="tactile-btn rounded-full bg-[#141418] border border-[#F5F0E6]/12 px-3 py-1.5 text-xs font-semibold text-[#F5F0E6] cursor-pointer"
+          class="tactile-btn rounded-full bg-[#141418] border border-[#F5F0E6]/12 px-2.5 py-1 text-[11px] font-semibold text-[#F5F0E6] cursor-pointer"
         >
           ⏱ 3s
-        </button>
-        <button
-          data-flip-btn
-          type="button"
-          aria-label="Switch camera"
-          class="tactile-btn rounded-full bg-[#141418] border border-[#F5F0E6]/12 px-3 py-1.5 text-xs font-semibold text-[#F5F0E6] cursor-pointer"
-        >
-          ↻ Flip
         </button>
       </div>
     </header>
 
-    <section data-stage class="relative flex-1 flex flex-col items-center justify-center opacity-0 scale-[0.98]">
-      <div class="bezel-outer w-full aspect-[3/4] max-h-[54dvh] relative overflow-hidden">
+    <section data-stage class="relative flex-1 min-h-0 flex items-center justify-center opacity-0 scale-[0.98]">
+      <div class="bezel-outer w-full h-full max-h-full relative overflow-hidden">
         <div class="bezel-inner w-full h-full relative overflow-hidden bg-[#0E0E12]">
           <video
             data-video
@@ -84,17 +76,17 @@ appRoot.innerHTML = `
 
           <div
             data-progress
-            class="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-[#0A0A0D]/75 backdrop-blur-md border border-[#F5F0E6]/12 px-3 py-1.5"
+            class="absolute top-2.5 left-2.5 flex items-center gap-[6px] rounded-full bg-[#0A0A0D]/75 backdrop-blur-md border border-[#F5F0E6]/12 px-2.5 py-1.5"
           ></div>
 
           <div
             data-mini-preview
-            class="absolute top-3 right-3 rounded-xl p-1.5 shadow-lg border backdrop-blur-md transition-colors duration-200 pointer-events-none"
+            class="absolute top-2.5 right-2.5 rounded-xl p-[6px] shadow-lg border backdrop-blur-md transition-colors duration-200 pointer-events-none"
           ></div>
 
           <div
             data-pose-cue
-            class="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-[#0A0A0D]/80 backdrop-blur-md border border-[#FF2D8B]/40 px-4 py-1.5 text-xs font-semibold text-[#F5F0E6] whitespace-nowrap pointer-events-none opacity-0"
+            class="absolute bottom-2.5 left-1/2 -translate-x-1/2 rounded-full bg-[#0A0A0D]/80 backdrop-blur-md border border-[#FF2D8B]/40 px-3.5 py-1 text-xs font-semibold text-[#F5F0E6] whitespace-nowrap pointer-events-none opacity-0"
           ></div>
 
           <div
@@ -112,18 +104,28 @@ appRoot.innerHTML = `
       </div>
     </section>
 
-    <section data-controls class="flex flex-col gap-3 pb-1 opacity-0 translate-y-3">
+    <section data-controls class="shrink-0 flex flex-col gap-[6px] opacity-0 translate-y-3">
       <div data-effects-slot></div>
       <div data-layouts-slot></div>
 
-      <div class="flex items-center justify-center pt-1">
+      <div class="flex items-center justify-center gap-6 pt-[2px]">
+        <div class="w-10 h-10" aria-hidden="true"></div>
         <button
           data-shutter
           type="button"
-          aria-label="Take photobooth strip"
-          class="tactile-btn relative w-[72px] h-[72px] rounded-full p-1.5 border-[3px] border-[#F5F0E6] bg-transparent flex items-center justify-center cursor-pointer shadow-[0_0_28px_rgba(255,45,139,0.35)]"
+          aria-label="Take photo"
+          class="tactile-btn relative w-[66px] h-[66px] rounded-full p-1.5 border-[3px] border-[#F5F0E6] bg-transparent flex items-center justify-center cursor-pointer shadow-[0_0_24px_rgba(255,45,139,0.35)]"
         >
           <span class="w-full h-full rounded-full bg-[#FF2D8B] block"></span>
+        </button>
+        <button
+          data-flip-btn
+          type="button"
+          aria-label="Switch camera"
+          title="Flip camera"
+          class="tactile-btn w-10 h-10 rounded-full bg-[#141418] border border-[#F5F0E6]/15 flex items-center justify-center text-base font-bold text-[#F5F0E6] cursor-pointer"
+        >
+          ↻
         </button>
       </div>
     </section>
@@ -345,6 +347,8 @@ const effectsBar = createEffectsBar({
 
 const reviewSheet = createReviewSheet({
   onRetake: () => {
+    currentRoute = 'booth';
+    history.replaceState({ route: 'booth' }, '', '#/booth');
     liveThumbs = [];
     renderProgressDots(0);
     renderMiniPreview([]);
@@ -353,6 +357,8 @@ const reviewSheet = createReviewSheet({
 
 const permissionModal = createPermissionModal({
   onGrantCamera: async () => {
+    currentRoute = 'booth';
+    history.replaceState({ route: 'booth' }, '', '#/booth');
     await saveCookieConsent(true);
     await camera.start(videoEl, 'user');
     localStorage.setItem(CAMERA_GRANTED_KEY, '1');
@@ -422,13 +428,60 @@ timerBtn.addEventListener('click', () => {
   void savePreferences(prefs);
 });
 
+type AppRoute = 'booth' | 'review' | 'permissions';
+let currentRoute: AppRoute = 'booth';
+
+function pushAppRoute(route: AppRoute): void {
+  if (currentRoute === route) return;
+  currentRoute = route;
+  history.pushState({ route }, '', `#/${route}`);
+}
+
+function initRouteGuard(): void {
+  history.replaceState({ route: 'booth' }, '', '#/booth');
+  history.pushState({ route: 'booth' }, '', '#/booth');
+
+  window.addEventListener('popstate', (e) => {
+    const target = (e.state as { route?: AppRoute } | null)?.route ?? 'booth';
+    if (currentRoute === 'review') {
+      reviewSheet.close();
+      liveThumbs = [];
+      renderProgressDots(0);
+      renderMiniPreview([]);
+    }
+    if (currentRoute === 'permissions') {
+      permissionModal.hide();
+    }
+    currentRoute = target;
+    if (target === 'booth') {
+      history.pushState({ route: 'booth' }, '', '#/booth');
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key !== 'Backspace') return;
+    const tag = (e.target as HTMLElement | null)?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    e.preventDefault();
+    if (currentRoute === 'review') {
+      history.back();
+    }
+  });
+}
+
 flipBtn.addEventListener('click', async () => {
   if (isShooting) return;
+  gsap.fromTo(
+    flipBtn,
+    { rotate: 0 },
+    { rotate: 180, duration: 0.35, ease: 'back.out(1.4)' }
+  );
   try {
     const facing = await camera.flip(videoEl);
     videoEl.classList.toggle('-scale-x-100', facing === 'user');
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unable to switch camera.';
+    pushAppRoute('permissions');
     permissionModal.show(msg);
   }
 });
@@ -444,6 +497,14 @@ shutterBtn.addEventListener('click', async () => {
   renderProgressDots(0);
   renderMiniPreview([]);
 
+  gsap.to(shutterBtn, {
+    scale: 0.92,
+    duration: 0.25,
+    repeat: -1,
+    yoyo: true,
+    ease: 'sine.inOut'
+  });
+
   try {
     for (let i = 0; i < layout.shotCount; i++) {
       showPoseCue(`Shot ${i + 1}/${layout.shotCount} · ${POSE_CUES[i % POSE_CUES.length]}`);
@@ -454,6 +515,11 @@ shutterBtn.addEventListener('click', async () => {
       liveThumbs.push(frame.toDataURL('image/jpeg', 0.45));
       renderProgressDots(i + 1);
       renderMiniPreview(liveThumbs);
+      gsap.fromTo(
+        miniPreviewEl,
+        { scale: 1.08 },
+        { scale: 1, duration: 0.28, ease: 'back.out(1.6)' }
+      );
       if (i < layout.shotCount - 1) {
         await new Promise((r) => setTimeout(r, 450));
       }
@@ -461,8 +527,11 @@ shutterBtn.addEventListener('click', async () => {
 
     hidePoseCue();
     const photo = await compositePhotoboothStrip(shots, layout, prefs.stripTheme);
+    pushAppRoute('review');
     reviewSheet.open(photo);
   } finally {
+    gsap.killTweensOf(shutterBtn);
+    gsap.set(shutterBtn, { scale: 1 });
     hidePoseCue();
     isShooting = false;
     shutterBtn.disabled = false;
@@ -486,6 +555,7 @@ async function hasSavedCameraPermission(): Promise<boolean> {
 }
 
 async function bootstrap() {
+  initRouteGuard();
   const session = await fetchSessionState();
   prefs = session.preferences;
   layoutPicker.setLayout(prefs.layoutId);
@@ -496,19 +566,19 @@ async function bootstrap() {
   startRenderLoop();
 
   // Entrance choreography (composite-only)
-  gsap.to(headerEl, { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' });
+  gsap.to(headerEl, { opacity: 1, y: 0, duration: 0.38, ease: 'power3.out' });
   gsap.to(stageEl, {
     opacity: 1,
     scale: 1,
-    duration: 0.45,
-    delay: 0.06,
+    duration: 0.42,
+    delay: 0.05,
     ease: 'power3.out'
   });
   gsap.to(controlsEl, {
     opacity: 1,
     y: 0,
-    duration: 0.45,
-    delay: 0.12,
+    duration: 0.42,
+    delay: 0.1,
     ease: 'power3.out'
   });
 
@@ -521,9 +591,11 @@ async function bootstrap() {
     } catch (err) {
       localStorage.removeItem(CAMERA_GRANTED_KEY);
       const msg = err instanceof Error ? err.message : undefined;
+      pushAppRoute('permissions');
       permissionModal.show(msg);
     }
   } else {
+    pushAppRoute('permissions');
     permissionModal.show();
   }
 }
