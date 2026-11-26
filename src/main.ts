@@ -345,13 +345,21 @@ const effectsBar = createEffectsBar({
   onClearAll: () => effects.clearAll()
 });
 
+let lastShots: HTMLCanvasElement[] = [];
+
 const reviewSheet = createReviewSheet({
   onRetake: () => {
     currentRoute = 'booth';
     history.replaceState({ route: 'booth' }, '', '#/booth');
+    lastShots = [];
     liveThumbs = [];
     renderProgressDots(0);
     renderMiniPreview([]);
+  },
+  onUpdateCaption: async (caption: string) => {
+    if (lastShots.length === 0) return null;
+    const layout = getLayoutById(prefs.layoutId);
+    return compositePhotoboothStrip(lastShots, layout, prefs.stripTheme, caption);
   }
 });
 
@@ -526,6 +534,7 @@ shutterBtn.addEventListener('click', async () => {
     }
 
     hidePoseCue();
+    lastShots = shots;
     const photo = await compositePhotoboothStrip(shots, layout, prefs.stripTheme);
     pushAppRoute('review');
     reviewSheet.open(photo);

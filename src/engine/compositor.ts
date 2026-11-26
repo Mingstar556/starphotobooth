@@ -119,7 +119,8 @@ function decorateThemeBackground(
 export async function compositePhotoboothStrip(
   frames: HTMLCanvasElement[],
   layout: BoothLayout,
-  themeId: StripTheme
+  themeId: StripTheme,
+  customCaption?: string
 ): Promise<CompositedPhoto> {
   const canvas = document.createElement('canvas');
   canvas.width = layout.canvasWidth;
@@ -169,7 +170,8 @@ export async function compositePhotoboothStrip(
   ctx.font = '700 30px "Syne", sans-serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText('STARPHOTOBOOTH', layout.padding, footerCenterY - 12);
+  const titleText = customCaption?.trim() ? customCaption.trim() : 'STARPHOTOBOOTH';
+  ctx.fillText(titleText, layout.padding, footerCenterY - 12);
 
   const now = new Date();
   const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;

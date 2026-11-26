@@ -110,7 +110,10 @@ export class EffectsEngine {
             delegate: 'GPU'
           },
           runningMode: 'VIDEO',
-          numFaces: 1
+          numFaces: 1,
+          minFaceDetectionConfidence: 0.4,
+          minFacePresenceConfidence: 0.4,
+          minTrackingConfidence: 0.4
         });
       } catch {
         this.landmarker = null;
@@ -143,12 +146,34 @@ export class EffectsEngine {
       this.lastVideoTime = video.currentTime;
       const result = this.landmarker.detectForVideo(video, nowMs);
       if (result.faceLandmarks.length > 0) {
-        this.lastAnchor = this.extractAnchor(
+        const next = this.extractAnchor(
           result.faceLandmarks[0],
           w,
           h,
           mirrored
         );
+        if (this.lastAnchor) {
+          const a = 0.55;
+          const lerp = (p: number, n: number) => p + (n - p) * a;
+          this.lastAnchor = {
+            foreheadX: lerp(this.lastAnchor.foreheadX, next.foreheadX),
+            foreheadY: lerp(this.lastAnchor.foreheadY, next.foreheadY),
+            noseX: lerp(this.lastAnchor.noseX, next.noseX),
+            noseY: lerp(this.lastAnchor.noseY, next.noseY),
+            leftEyeX: lerp(this.lastAnchor.leftEyeX, next.leftEyeX),
+            leftEyeY: lerp(this.lastAnchor.leftEyeY, next.leftEyeY),
+            rightEyeX: lerp(this.lastAnchor.rightEyeX, next.rightEyeX),
+            rightEyeY: lerp(this.lastAnchor.rightEyeY, next.rightEyeY),
+            leftCheekX: lerp(this.lastAnchor.leftCheekX, next.leftCheekX),
+            leftCheekY: lerp(this.lastAnchor.leftCheekY, next.leftCheekY),
+            rightCheekX: lerp(this.lastAnchor.rightCheekX, next.rightCheekX),
+            rightCheekY: lerp(this.lastAnchor.rightCheekY, next.rightCheekY),
+            faceWidth: lerp(this.lastAnchor.faceWidth, next.faceWidth),
+            rollRad: next.rollRad
+          };
+        } else {
+          this.lastAnchor = next;
+        }
       } else {
         this.lastAnchor = null;
       }
@@ -197,7 +222,7 @@ export class EffectsEngine {
     const tx2 = mapX(rightTemple.x);
     const ty2 = mapY(rightTemple.y);
 
-    const faceWidth = Math.max(Math.hypot(tx2 - tx1, ty2 - ty1), w * 0.22);
+    const faceWidth = Math.max(Math.hypot(tx2 - tx1, ty2 - ty1), w * 0.24) * 1.28;
     const rollRad = Math.atan2(ry - ly, rx - lx);
 
     return {

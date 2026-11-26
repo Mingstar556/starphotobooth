@@ -1,5 +1,7 @@
+import gsap from 'gsap';
 import {
   BOOTH_LAYOUTS,
+  getLayoutById,
   STRIP_THEMES,
   type BoothLayout,
   type LayoutId,
@@ -37,47 +39,119 @@ export function createLayoutPicker(options: {
   const el = document.createElement('div');
   el.className = 'w-full flex flex-col gap-[6px]';
 
-  const layoutRow = document.createElement('div');
-  layoutRow.className = 'flex items-center gap-[6px] overflow-x-auto no-scrollbar py-[2px]';
+  // Compact bar: active layout trigger + slide-up button + scrollable themes
+  const topRow = document.createElement('div');
+  topRow.className = 'flex items-center gap-[6px]';
 
-  const themeRow = document.createElement('div');
-  themeRow.className = 'flex items-center gap-[6px]';
-  themeRow.innerHTML = `
-    <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A9A396] shrink-0">
-      Frame
-    </span>
-    <div data-themes class="flex items-center gap-[6px] overflow-x-auto no-scrollbar py-[2px]"></div>
+  const triggerBtn = document.createElement('button');
+  triggerBtn.type = 'button';
+  triggerBtn.className =
+    'tactile-btn shrink-0 flex items-center gap-2 rounded-xl px-2.5 py-1.5 bg-[#FF2D8B] text-[#F5F0E6] shadow-[0_0_16px_rgba(255,45,139,0.3)] cursor-pointer';
+
+  const themesContainer = document.createElement('div');
+  themesContainer.className = 'flex items-center gap-[6px] overflow-x-auto no-scrollbar py-[2px] flex-1';
+
+  topRow.appendChild(triggerBtn);
+  topRow.appendChild(themesContainer);
+  el.appendChild(topRow);
+
+  // Slide-up 2-column layout drawer
+  const drawer = document.createElement('div');
+  drawer.className =
+    'fixed inset-0 z-40 flex items-end justify-center bg-[#0A0A0D]/80 backdrop-blur-lg p-3 safe-bottom opacity-0 pointer-events-none';
+  drawer.innerHTML = `
+    <div data-drawer-card class="w-full max-w-md bezel-outer transform translate-y-12">
+      <div class="bezel-inner p-4 flex flex-col gap-3 max-h-[72dvh]">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-display text-base font-bold text-[#F5F0E6]">Choose Layout</h3>
+            <p class="text-[11px] text-[#A9A396]">Tap any booth grid or strip</p>
+          </div>
+          <button
+            data-close
+            type="button"
+            class="tactile-btn rounded-full bg-[#1C1C22] border border-[#F5F0E6]/12 px-3 py-1 text-xs font-semibold text-[#F5F0E6] cursor-pointer"
+          >
+            Done ▾
+          </button>
+        </div>
+        <div data-grid class="grid grid-cols-2 gap-[6px] overflow-y-auto no-scrollbar pr-0.5"></div>
+      </div>
+    </div>
   `;
+  document.body.appendChild(drawer);
 
-  const themesContainer = themeRow.querySelector<HTMLElement>('[data-themes]')!;
+  const drawerCard = drawer.querySelector<HTMLElement>('[data-drawer-card]')!;
+  const closeBtn = drawer.querySelector<HTMLButtonElement>('[data-close]')!;
+  const gridEl = drawer.querySelector<HTMLElement>('[data-grid]')!;
 
-  function renderLayouts() {
-    layoutRow.innerHTML = '';
+  function openDrawer() {
+    drawer.classList.remove('pointer-events-none');
+    gsap.killTweensOf([drawer, drawerCard]);
+    gsap.to(drawer, { opacity: 1, duration: 0.2, ease: 'power2.out' });
+    gsap.fromTo(
+      drawerCard,
+      { y: 48 },
+      { y: 0, duration: 0.34, ease: 'power3.out' }
+    );
+  }
+
+  function closeDrawer() {
+    gsap.killTweensOf([drawer, drawerCard]);
+    gsap.to(drawerCard, { y: 40, duration: 0.2, ease: 'power2.in' });
+    gsap.to(drawer, {
+      opacity: 0,
+      duration: 0.2,
+      ease: 'power2.in',
+      onComplete: () => {
+        drawer.classList.add('pointer-events-none');
+      }
+    });
+  }
+
+  triggerBtn.addEventListener('click', openDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
+  drawer.addEventListener('click', (e) => {
+    if (e.target === drawer) closeDrawer();
+  });
+
+  function renderTrigger() {
+    const current = getLayoutById(activeLayout);
+    triggerBtn.innerHTML = `
+      ${renderMiniGrid(current)}
+      <span class="text-xs font-bold whitespace-nowrap">${current.name}</span>
+      <span class="text-[10px] opacity-90">▴</span>
+    `;
+  }
+
+  function renderGrid() {
+    gridEl.innerHTML = '';
     for (const layout of BOOTH_LAYOUTS) {
       const isSelected = layout.id === activeLayout;
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `tactile-btn shrink-0 flex items-center gap-2 rounded-xl px-2.5 py-1.5 border text-left cursor-pointer ${
+      btn.className = `tactile-btn flex items-center gap-2.5 rounded-xl p-2.5 border text-left cursor-pointer ${
         isSelected
-          ? 'bg-[#FF2D8B] border-[#FF2D8B] text-[#F5F0E6] shadow-[0_0_18px_rgba(255,45,139,0.35)]'
+          ? 'bg-[#FF2D8B] border-[#FF2D8B] text-[#F5F0E6] shadow-[0_0_16px_rgba(255,45,139,0.35)]'
           : 'bg-[#141418] border-[#F5F0E6]/10 text-[#F5F0E6] hover:border-[#F5F0E6]/25'
       }`;
       btn.innerHTML = `
         ${renderMiniGrid(layout)}
-        <span class="flex flex-col leading-tight">
-          <span class="text-xs font-semibold whitespace-nowrap">${layout.name}</span>
+        <span class="flex flex-col leading-tight min-w-0">
+          <span class="text-xs font-semibold truncate">${layout.name}</span>
           <span class="text-[10px] ${
             isSelected ? 'text-[#F5F0E6]/90' : 'text-[#A9A396]'
-          } whitespace-nowrap">${layout.subtitle}</span>
+          } truncate">${layout.subtitle}</span>
         </span>
       `;
       btn.addEventListener('click', () => {
-        if (activeLayout === layout.id) return;
         activeLayout = layout.id;
-        renderLayouts();
+        renderTrigger();
+        renderGrid();
         options.onSelectLayout(layout.id);
+        closeDrawer();
       });
-      layoutRow.appendChild(btn);
+      gridEl.appendChild(btn);
     }
   }
 
@@ -108,17 +182,16 @@ export function createLayoutPicker(options: {
     });
   }
 
-  renderLayouts();
+  renderTrigger();
+  renderGrid();
   renderThemes();
-
-  el.appendChild(layoutRow);
-  el.appendChild(themeRow);
 
   return {
     el,
     setLayout(id: LayoutId) {
       activeLayout = id;
-      renderLayouts();
+      renderTrigger();
+      renderGrid();
     },
     setTheme(theme: StripTheme) {
       activeTheme = theme;
