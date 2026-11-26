@@ -33,7 +33,14 @@ appRoot.innerHTML = `
         </h1>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
+        <button
+          data-install-btn
+          type="button"
+          class="hidden tactile-btn rounded-full bg-[#F5F0E6] px-3 py-1.5 text-xs font-bold text-[#0A0A0D] cursor-pointer"
+        >
+          📲 Install
+        </button>
         <button
           data-vibe-btn
           type="button"
@@ -131,9 +138,36 @@ const countdownEl = appRoot.querySelector<HTMLElement>('[data-countdown]')!;
 const countdownText = countdownEl.querySelector('span')!;
 const flashEl = appRoot.querySelector<HTMLElement>('[data-flash]')!;
 const vibeBtn = appRoot.querySelector<HTMLButtonElement>('[data-vibe-btn]')!;
+const installBtn = appRoot.querySelector<HTMLButtonElement>('[data-install-btn]')!;
 const timerBtn = appRoot.querySelector<HTMLButtonElement>('[data-timer-btn]')!;
 const flipBtn = appRoot.querySelector<HTMLButtonElement>('[data-flip-btn]')!;
 const shutterBtn = appRoot.querySelector<HTMLButtonElement>('[data-shutter]')!;
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+let deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e as BeforeInstallPromptEvent;
+  installBtn.classList.remove('hidden');
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  installBtn.classList.add('hidden');
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  await deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installBtn.classList.add('hidden');
+});
 const effectsSlot = appRoot.querySelector<HTMLElement>('[data-effects-slot]')!;
 const layoutsSlot = appRoot.querySelector<HTMLElement>('[data-layouts-slot]')!;
 
